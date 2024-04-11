@@ -19,6 +19,8 @@ public class DetectScore : MonoBehaviour
     private void OnTriggerEnter(Collider collider) {
         if (collider.gameObject.name == "AlmaPointDetector") {
             Debug.Log("Trigger works");
+            Score.currentScore +=1;
+            GetComponent<Collider>().enabled = false;
         }
     }
 
