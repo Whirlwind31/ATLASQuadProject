@@ -318,7 +318,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: d96075572a5bc5549bb733828424b7d9, type: 2}
     - target: {fileID: 919132149155446097, guid: dbb69abef1b993543bba463dca82bd3d, type: 3}
       propertyPath: m_Name
-      value: torus
+      value: torus_working
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: dbb69abef1b993543bba463dca82bd3d, type: 3}
       propertyPath: m_Layer
@@ -409,6 +409,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb69abef1b993543bba463dca82bd3d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2042074410420581473}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb69abef1b993543bba463dca82bd3d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1681528981558494135}
   m_SourcePrefab: {fileID: 100100000, guid: dbb69abef1b993543bba463dca82bd3d, type: 3}
 --- !u!1 &4840313705835279752 stripped
 GameObject:
@@ -946,6 +949,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1681528981558494135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4840313705835279752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa0b30a7ba3e0c43a1b56718a94e644, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  torus_prefab: {fileID: 4840313705835279752}
 --- !u!4 &5217401506800889650 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dbb69abef1b993543bba463dca82bd3d, type: 3}

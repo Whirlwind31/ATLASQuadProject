@@ -23,14 +23,4 @@ public class DetectScore : MonoBehaviour
             GetComponent<Collider>().enabled = false;
         }
     }
-
-    private void OnCollisionEnter(Collision collision) {
-        //Another object touches torus
-        //collision is the collider that has collided with us
-        Debug.Log(collision.gameObject.name + "has collided with the torus");
-
-        if (collision.gameObject.name == "AlmaPointDetector") {
-            Debug.Log("Point scored");
-        }
-    }
 }
