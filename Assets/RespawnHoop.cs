@@ -18,14 +18,25 @@ public class RespawnHoop : MonoBehaviour
 
     public GameObject torus_prefab;
     public bool hasCollided = false;
-    private void OnCollisionEnter(Collision collision) {
+    private void OnCollisionStay(Collision collision) {
         //Another object touches torus
         //collision is the collider that has collided with us
-        Debug.Log(collision.gameObject.name + "has collided with the torus");
-        if (collision.gameObject.name != "Cube" && hasCollided == false) {
-            hasCollided = true;
+        if (collision.gameObject.name != "Cube" && collision.gameObject.name.Contains("torus") == false) {
+            if (hasCollided) {
+                Debug.Log("Already collided, do nothing");
+                return;
+            }
+
+            if (hasCollided == false) {
+                Debug.Log("Has not collided yet, respawning torus");
+                hasCollided = true;
+            }
+
             Instantiate (torus_prefab, new Vector3 (-33.36f,1.75f,-65.6f), transform.rotation);
-            Debug.Log("Respawned");
         }
+        // if (collision.gameObject.name != "Cube" && hasCollided == false) {
+        //     Instantiate (torus_prefab, new Vector3 (-33.36f,1.75f,-65.6f), transform.rotation);
+        //     Debug.Log("Respawned");
+        // }
     }
 }
