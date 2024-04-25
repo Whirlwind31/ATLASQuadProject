@@ -32,7 +32,7 @@ public class RespawnHoop : MonoBehaviour
                 hasCollided = true;
             }
 
-            Instantiate (torus_prefab, new Vector3 (-33.36f,1.75f,-65.6f), transform.rotation);
+            Instantiate (torus_prefab, new Vector3 (-33.79f,1.85f,-69.7f), transform.rotation);
         }
         // if (collision.gameObject.name != "Cube" && hasCollided == false) {
         //     Instantiate (torus_prefab, new Vector3 (-33.36f,1.75f,-65.6f), transform.rotation);
