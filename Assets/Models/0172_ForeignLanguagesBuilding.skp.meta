@@ -5,8 +5,8 @@ SketchUpImporter:
   internalIDToNameTable: []
   externalObjects: {}
   materials:
-    materialImportMode: 2
-    materialName: 2
+    materialImportMode: 1
+    materialName: 1
     materialSearch: 0
     materialLocation: 0
   animations:
@@ -113,4 +113,4 @@ SketchUpImporter:
   assetHash:
     serializedVersion: 2
     Hash: ec2f7a39cfd5a9d9b2c0aac11b4fd0b4
-  fileUnit: 0
+  fileUnit: 4
