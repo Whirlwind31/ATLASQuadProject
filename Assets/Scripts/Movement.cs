@@ -26,6 +26,7 @@ public class MoveTest : MonoBehaviour
     // Avoid trigger
     private bool isAvoiding = false;
 
+    // Coroutine object used for easier changing between states.
     private Coroutine currentCoroutine;
 
     // Start is called before the first frame update
