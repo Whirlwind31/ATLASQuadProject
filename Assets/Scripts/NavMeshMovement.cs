@@ -100,7 +100,7 @@ public class NavMeshMovement : MonoBehaviour
 
     /// <summary>
     /// Avoiding behavior of the GameObject. It moves away from the player.
-    /// TODO: Implement the faster movement
+    /// TODO: Implement the faster movement.
     /// </summary>
     IEnumerator Avoid()
     {
@@ -141,7 +141,11 @@ public class NavMeshMovement : MonoBehaviour
 
         StartCoroutine(AvoidCooldown());
     }
-
+    
+    /// <summary>
+    /// Helper function that checks if the player has been within avoid distance of the GameObject
+    /// for a set amount of time, resetting the avoid speed of the GameObject if the player has not.
+    /// </summary>
     IEnumerator AvoidCooldown()
     {
         float elapsedT = 0f;
@@ -158,6 +162,10 @@ public class NavMeshMovement : MonoBehaviour
         recentlyAvoided = false;
     }
 
+    /// <summary>
+    /// Update is called once per frame. It is used to check the distance between the player 
+    /// and the GameObject.
+    /// </summary>
     void Update()
     {
         float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
