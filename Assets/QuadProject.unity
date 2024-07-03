@@ -1746,16 +1746,13 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 871695593}
-    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 871695595}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 871695597}
+      addedObject: {fileID: 871695598}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 871695598}
+      addedObject: {fileID: 871695600}
   m_SourcePrefab: {fileID: 100100000, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
 --- !u!1 &403588407
 GameObject:
@@ -4069,33 +4066,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
   m_PrefabInstance: {fileID: 402327237}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &871695593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 871695592}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a98b0a9aae159a438c59ec933553b3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 24
-  avoidDistance: 8
-  objectAvoidDistance: 2
-  rotationSpeed: 4
-  moveDistance: 8
-  moveTime: 2
-  wanderWaitTime: 2
-  wanderTriggerChance: 0.3
-  yPos: 0
-  avoidSpeedModifier: 1.6
-  cooldownTime: 30
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  player: {fileID: 1168436628}
 --- !u!95 &871695595
 Animator:
   serializedVersion: 5
@@ -4117,25 +4087,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &871695597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 871695592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ac4f83bef9d9a46bc670fab7c03795, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wanderWaitTime: 2
-  wanderTriggerChance: 0.3
-  avoidDistance: 16
-  cooldownTime: 30
-  player: {fileID: 1168436628}
-  agentSpeed: 12
-  agentAcceleration: 8
 --- !u!195 &871695598
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -4158,6 +4109,25 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &871695600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871695592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ac4f83bef9d9a46bc670fab7c03795, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wanderWaitTime: 2
+  wanderTriggerChance: 0.3
+  avoidDistance: 4
+  cooldownTime: 30
+  player: {fileID: 0}
+  agentSpeed: 6
+  agentAcceleration: 8
 --- !u!1 &873848150 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 71f74448b85eb17409aa434b0356a084, type: 3}
