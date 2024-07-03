@@ -11,14 +11,14 @@ public class MoveTestTestScript
     public void MoveTestTestScriptSimplePasses()
     {
         // Use the Assert class to test conditions
-        Assert.AreEqual(new Vector3(0, 0, 1), MoveTest.DirectionVector(1));
-        Assert.AreEqual(new Vector3(1, 0, 1), MoveTest.DirectionVector(2));
-        Assert.AreEqual(new Vector3(1, 0, 0), MoveTest.DirectionVector(3));
-        Assert.AreEqual(new Vector3(1, 0, -1), MoveTest.DirectionVector(4));
-        Assert.AreEqual(new Vector3(0, 0, -1), MoveTest.DirectionVector(5));
-        Assert.AreEqual(new Vector3(-1, 0, -1), MoveTest.DirectionVector(6));
-        Assert.AreEqual(new Vector3(-1, 0, 0), MoveTest.DirectionVector(7));
-        Assert.AreEqual(new Vector3(-1, 0, 1), MoveTest.DirectionVector(8));
+        Assert.AreEqual(new Vector3(0, 0, 1), Movement.DirectionVector(1));
+        Assert.AreEqual(new Vector3(1, 0, 1), Movement.DirectionVector(2));
+        Assert.AreEqual(new Vector3(1, 0, 0), Movement.DirectionVector(3));
+        Assert.AreEqual(new Vector3(1, 0, -1), Movement.DirectionVector(4));
+        Assert.AreEqual(new Vector3(0, 0, -1), Movement.DirectionVector(5));
+        Assert.AreEqual(new Vector3(-1, 0, -1), Movement.DirectionVector(6));
+        Assert.AreEqual(new Vector3(-1, 0, 0), Movement.DirectionVector(7));
+        Assert.AreEqual(new Vector3(-1, 0, 1), Movement.DirectionVector(8));
     }
 
     // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

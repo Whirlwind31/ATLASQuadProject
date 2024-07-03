@@ -2,31 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveTest : MonoBehaviour
+public class Movement : MonoBehaviour
 {
     // Global variables used throughout the script. May be changed from the Unity Editor.
+    // NOTE: If changing the scale you will very likely need to adjust the avoidDistance variable.
     public float moveSpeed = 6.0f;
     public float avoidDistance = 4.0f;
-    public float rotationSpeed = 4.0f; 
+    public float objectAvoidDistance = 2.0f;
+    public float rotationSpeed = 4.0f;
     public float moveDistance = 3.0f;
     public float moveTime = 2.0f;
     public float wanderWaitTime = 2.0f; // in seconds
     public float wanderTriggerChance = 0.3f; // has to be between 0 and 1
     public float yPos = 0f;
+    public float avoidSpeedModifier = 1.5f;
+    public float cooldownTime = 30f; // in seconds
+
+    // Obstacle layer
+    [SerializeField]
+    private LayerMask obstacleLayer;
 
     // Player object, can be changed from Unity Editor
-    public Transform player;
+    [SerializeField]
+    private Transform player;
 
     // Pseudo-random number, will be used to generate a Vector3 object.
     private int vectorNum;
 
     // Animator object to be used for the GameObject's animations.
     private Animator animator;
-    
+
     // Avoid trigger
     private bool isAvoiding = false;
 
+    // Checks if the player recently got close to the GameObject
+    private bool recentlyAvoided = false;
+
     private Coroutine currentCoroutine;
+
+    private int increment = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -89,14 +103,24 @@ public class MoveTest : MonoBehaviour
         Vector3 targetPos = initialPos + directionVector * moveDistance;
         targetPos.y = 0f;
 
+        Quaternion initialRot = transform.rotation;
         Quaternion targetRotation = Quaternion.LookRotation(directionVector);
         targetRotation.x = 0f;
+        targetRotation.z = 0f;
 
         Vector3 tempPos;
+        Quaternion tempRot = transform.rotation;
 
         while (elapsedT < finalT)
         {
-            tempPos = transform.position;
+            // Checks if an obstacle is in front of the GameObject
+            if (Physics.Raycast(transform.position, directionVector, out RaycastHit hit, avoidDistance, obstacleLayer))
+            {
+                directionVector = Vector3.Reflect(directionVector, hit.normal);
+                directionVector.y = 0f;
+                targetRotation = Quaternion.LookRotation(directionVector);
+            }
+
             tempPos = Vector3.Lerp(initialPos, targetPos, elapsedT / finalT);
             tempPos.y = 0f;
 
@@ -107,7 +131,10 @@ public class MoveTest : MonoBehaviour
                 break;
             }
 
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, elapsedT / finalT);
+            tempRot = Quaternion.Slerp(transform.rotation, targetRotation, elapsedT / finalT);
+            tempRot.x = 0f;
+            tempRot.z = 0f;
+            transform.rotation = tempRot;
 
             elapsedT += Time.deltaTime;
             yield return null;
@@ -137,15 +164,22 @@ public class MoveTest : MonoBehaviour
 
         Vector3 directionAwayFromPlayer = (transform.position - player.position).normalized;
         Vector3 initialPos = transform.position;
-        
-        // Fleeing behavior, added a .5x modifier to mimic faster, fleeing motion.
-        Vector3 targetPos = initialPos + directionAwayFromPlayer * (1.5f * moveDistance);
+
+        Vector3 targetPos;
+
+        if (recentlyAvoided && increment < 2)
+        {
+            increment += 1;
+        }
+
+        float modifier = Mathf.Pow(avoidSpeedModifier, increment);
+        targetPos = initialPos + directionAwayFromPlayer * (modifier * moveDistance);
         targetPos.y = 0f;
 
         Quaternion targetRotation = Quaternion.LookRotation(directionAwayFromPlayer);
-        targetRotation.x = 0f;
 
         Vector3 tempPos = transform.position;
+        Quaternion tempRot = transform.rotation;
 
         if (animator != null)
         {
@@ -154,27 +188,50 @@ public class MoveTest : MonoBehaviour
 
         while (elapsedT < finalT)
         {
-            tempPos = transform.position;
+
+            if (Physics.Raycast(transform.position, directionAwayFromPlayer, out RaycastHit hit, avoidDistance, obstacleLayer))
+            {
+                directionAwayFromPlayer = Vector3.Reflect(directionAwayFromPlayer, hit.normal);
+                targetRotation = Quaternion.LookRotation(directionAwayFromPlayer);
+            }
+
             tempPos = Vector3.Lerp(initialPos, targetPos, elapsedT / finalT);
             tempPos.y = 0f;
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, elapsedT / finalT);
+
+            tempRot = Quaternion.Slerp(transform.rotation, targetRotation, elapsedT / finalT);
+            tempRot.x = 0f;
+            tempRot.z = 0f;
+            transform.rotation = tempRot;
 
             transform.position = tempPos;
 
             elapsedT += Time.deltaTime;
-            yield return null; 
+
+            yield return null;
         }
 
         transform.position = targetPos;
         transform.rotation = targetRotation;
 
+        targetRotation.x = 0f;
+        targetRotation.z = 0f;
+
         if (animator != null)
         {
             animator.SetBool("Moving", false);
         }
+
+        if (!recentlyAvoided)
+        {
+            recentlyAvoided = true;
+        }
+
         isAvoiding = false;
 
         currentCoroutine = StartCoroutine(Wander());
+
+        // Start the cooldown coroutine
+        StartCoroutine(AvoidCooldown());
     }
 
     /// <summary>
@@ -195,7 +252,7 @@ public class MoveTest : MonoBehaviour
         int num = y;
         Vector3 output = Vector3.zero;
 
-        switch(num)
+        switch (num)
         {
             case 1:
                 output += Vector3.forward;
@@ -230,6 +287,25 @@ public class MoveTest : MonoBehaviour
         return output;
     }
 
+    /// <summary>
+    /// Helper function that checks if the player has been within avoid distance of the GameObject
+    /// for a set amount of time, resetting the avoid speed of the GameObject if the player has not.
+    /// </summary>
+    IEnumerator AvoidCooldown()
+    {
+        float elapsedT = 0f;
+        while (elapsedT < cooldownTime)
+        {
+            if (Vector3.Distance(player.position, transform.position) <= avoidDistance)
+            {
+                yield break;
+            }
+            elapsedT += Time.deltaTime;
+            yield return null;
+        }
+        increment = 0;  // Reset increment after cooldown period
+        recentlyAvoided = false;
+    }
 
     /// <summary>
     /// Update is called once per frame. It is used to check the distance between the player 
@@ -248,6 +324,6 @@ public class MoveTest : MonoBehaviour
             }
             currentCoroutine = StartCoroutine(Avoid());
         }
-        
+
     }
 }
