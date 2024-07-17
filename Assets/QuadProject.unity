@@ -1969,9 +1969,6 @@ PrefabInstance:
       addedObject: {fileID: 871695609}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 871695611}
-    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 871695612}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       insertIndex: -1
@@ -1979,6 +1976,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 871695613}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 871695615}
   m_SourcePrefab: {fileID: 100100000, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
 --- !u!1 &403588407
 GameObject:
@@ -4681,18 +4681,6 @@ MonoBehaviour:
   _releaseDistance: 0
   _resetGrabOnGrabsUpdated: 1
   _physicsGrabbable: {fileID: 871695612}
---- !u!114 &871695611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 871695592}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e0f1f091c591784cbbbb67d62b66811, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &871695612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4729,6 +4717,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.26, y: 3.26, z: 3.26}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &871695615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871695592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e0f1f091c591784cbbbb67d62b66811, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delayTime: 2.5
 --- !u!1 &873848150 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 71f74448b85eb17409aa434b0356a084, type: 3}
