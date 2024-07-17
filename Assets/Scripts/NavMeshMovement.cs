@@ -1,7 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
 public class NavMeshMovement : MonoBehaviour
 {
     // Global variables used throughout the script. May be changed from the Unity Editor.
@@ -13,6 +13,7 @@ public class NavMeshMovement : MonoBehaviour
     public float agentAcceleration = 8.0f;
     public float baitDetectionDistance = 6.0f;
     public float baitStopDistance = 6.0f;
+    public float wanderRadius = 10.0f; // Added this line
 
     private float baseSpeed; // used to remember the speed of the NavMesh agent
 
@@ -37,7 +38,6 @@ public class NavMeshMovement : MonoBehaviour
     /// Start is called before the first frame update.
     /// Initiates the GameObject's properties.
     /// </summary>
-
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -102,70 +102,17 @@ public class NavMeshMovement : MonoBehaviour
     /// <returns> A vector pointing towards the random direction </returns>
     Vector3 GetRandomNavMeshLocation()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * avoidDistance;
+        Vector3 randomDirection = Random.insideUnitSphere * wanderRadius; // Changed to use wanderRadius
         randomDirection += transform.position;
         NavMeshHit navHit;
-        NavMesh.SamplePosition(randomDirection, out navHit, avoidDistance, NavMesh.AllAreas);
+        NavMesh.SamplePosition(randomDirection, out navHit, wanderRadius, NavMesh.AllAreas); // Changed to use wanderRadius
         return navHit.position;
     }
 
-    /// <summary>
-    /// Avoiding behavior of the GameObject. It moves away from the player.
-    /// TODO: Implement faster animation for fast speeds.
-    /// </summary>
-    IEnumerator Avoid()
-    {
-        isAvoiding = true;
-        Vector3 directionAwayFromPlayer = (transform.position - player.position).normalized;
-
-        if (recentlyAvoided && increment < 2)
-        {
-            increment += 1;
-        }
-
-        float modifier = Mathf.Pow(1.3f, increment);
-        agent.speed = baseSpeed * modifier;
-
-        Vector3 avoidTarget = transform.position + directionAwayFromPlayer * (modifier * avoidDistance);
-
-        NavMeshHit navHit;
-        NavMesh.SamplePosition(avoidTarget, out navHit, avoidDistance, NavMesh.AllAreas);
-
-        if (animator != null)
-        {
-            animator.SetBool("Moving", true);
-        }
-
-        // Debug.Log("Avoiding to: " + navHit.position);
-        agent.SetDestination(navHit.position);
-
-        while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
-        {
-            yield return null;
-        }
-
-        if (animator != null)
-        {
-            animator.SetBool("Moving", false);
-        }
-
-        if (!recentlyAvoided)
-        {
-            recentlyAvoided = true;
-        }
-
-        isAvoiding = false;
-
-        currentCoroutine = StartCoroutine(Wander());
-
-        StartCoroutine(AvoidCooldown());
-    }
 
     /// <summary>
-    /// Helper method that makes the GameObject moves towards
-    /// the designated bait object.
+    /// Helper method that makes the GameObject moves towards the designated bait object.
     /// </summary>
-    /// <returns></returns>
     IEnumerator MoveToBait()
     {
         if (animator != null)
@@ -192,6 +139,56 @@ public class NavMeshMovement : MonoBehaviour
         hasReachedBait = true;
 
         agent.enabled = false;
+    }
+
+    /// <summary>
+    /// Avoiding behavior of the GameObject. It moves away from the player.
+    /// </summary>
+    IEnumerator Avoid()
+    {
+        isAvoiding = true;
+        Vector3 directionAwayFromPlayer = (transform.position - player.position).normalized;
+
+        if (recentlyAvoided && increment < 2)
+        {
+            increment += 1;
+        }
+
+        float modifier = Mathf.Pow(1.3f, increment);
+        agent.speed = baseSpeed * modifier;
+
+        Vector3 avoidTarget = transform.position + directionAwayFromPlayer * (modifier * avoidDistance);
+
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(avoidTarget, out navHit, avoidDistance, NavMesh.AllAreas);
+
+        if (animator != null)
+        {
+            animator.SetBool("Moving", true);
+        }
+
+        agent.SetDestination(navHit.position);
+
+        while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool("Moving", false);
+        }
+
+        if (!recentlyAvoided)
+        {
+            recentlyAvoided = true;
+        }
+
+        isAvoiding = false;
+
+        currentCoroutine = StartCoroutine(Wander());
+
+        StartCoroutine(AvoidCooldown());
     }
 
     /// <summary>
@@ -230,10 +227,6 @@ public class NavMeshMovement : MonoBehaviour
         float distanceFromBait = Vector3.Distance(transform.position, bait.position);
         float playerToBaitDistance = Vector3.Distance(player.position, bait.position);
 
-        // Checks if:
-        // 1. object is within a certain distance of the bait
-        // 2. object is away from the player
-        // 3. player is away from the bait
         bool baitDistanceConditionals = distanceFromBait <= baitDetectionDistance &&
                                         distanceFromPlayer > avoidDistance &&
                                         playerToBaitDistance > avoidDistance;
