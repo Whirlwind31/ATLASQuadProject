@@ -87,6 +87,8 @@ public class NavMeshMovement : MonoBehaviour
                     yield return null;
                 }
 
+                agent.velocity = Vector3.zero;
+
                 if (animator != null)
                 {
                     animator.SetBool("Moving", false);
