@@ -40,6 +40,7 @@ public class NavMeshMovement : MonoBehaviour
     /// </summary>
     void Start()
     {
+        Debug.Log("Starting Object!");
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
 
@@ -133,6 +134,7 @@ public class NavMeshMovement : MonoBehaviour
             yield return null;
         }
 
+
         if (animator != null)
         {
             animator.SetBool("Moving", false);
@@ -175,6 +177,8 @@ public class NavMeshMovement : MonoBehaviour
         {
             yield return null;
         }
+
+        agent.velocity = Vector3.zero;
 
         if (animator != null)
         {
