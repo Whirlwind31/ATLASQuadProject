@@ -1916,7 +1916,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -41.3
+      value: -30.4
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1924,7 +1924,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -14.1
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4487,9 +4487,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectsToRain:
   - {fileID: 1882356144}
+  - {fileID: 1882356144}
+  - {fileID: 1882356144}
+  - {fileID: 1882356144}
+  - {fileID: 1882356144}
+  - {fileID: 1882356144}
+  - {fileID: 1882356144}
+  - {fileID: 1882356144}
   rainHeight: 40
-  rainCount: 180
-  rainAreaSize: 200
+  rainCount: 60
+  rainAreaSize: 120
+  triggerLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!65 &828139473
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4505,11 +4515,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 1, z: 4}
+  m_Size: {x: 40, y: 20, z: 40}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &828139474
 Transform:
@@ -4520,7 +4530,7 @@ Transform:
   m_GameObject: {fileID: 828139471}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.21, y: 27.47, z: 59.75}
+  m_LocalPosition: {x: 84.1, y: 5.6, z: 91.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5004,13 +5014,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   adjustDelay: 2.5
-  spawnDelay: 2
-  objectsToSpawn:
-  - {fileID: 1882356144}
-  - {fileID: 1882356144}
-  - {fileID: 1882356144}
-  - {fileID: 1882356144}
-  spawnHeight: 16
 --- !u!4 &871695616 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 6886800af11eb9a419e986f064e4bad9, type: 3}
