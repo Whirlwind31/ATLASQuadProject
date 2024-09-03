@@ -18,6 +18,10 @@ public class RainTriggerZone : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Generates a "rain" of objects in random points around
+    /// a specified radius.
+    /// </summary>
     IEnumerator RainObjects()
     {
         for (int i = 0; i < rainCount; i++)
@@ -31,7 +35,7 @@ public class RainTriggerZone : MonoBehaviour
                 );
                 Instantiate(obj, spawnPosition, Quaternion.identity);
             }
-            yield return new WaitForSeconds(0.1f); // Adjust the interval between spawns as needed
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }
