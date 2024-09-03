@@ -28,6 +28,12 @@ public class GroundedBehavior : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Checks if object is grounded, and adjusts position accordingly.
+    /// Waits for a specified delay time before checking again.
+    /// </summary>
+    /// <param name="delay"> Delay time </param>
+    /// <returns></returns>
     IEnumerator ResetPositionAndRotation(float delay)
     {
         yield return new WaitForSeconds(delay);
