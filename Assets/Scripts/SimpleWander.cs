@@ -5,11 +5,11 @@ using UnityEngine.AI;
 
 public class SimpleWander : MonoBehaviour
 {
-    public float wanderWaitTime = 2.0f;  // Time between wander actions
-    public float wanderRadius = 10.0f;    // Radius within which the object will wander
+    public float wanderWaitTime = 2.0f; 
+    public float wanderRadius = 10.0f;   
     public float agentSpeed = 6.0f;
     public float agentAcceleration = 8.0f;
-    public float rotationSpeed = 5.0f;    // Speed for smooth rotation
+    public float rotationSpeed = 5.0f; 
 
     private NavMeshAgent agent;
     private Animator animator;
@@ -19,7 +19,6 @@ public class SimpleWander : MonoBehaviour
     /// </summary>
     void Start()
     {
-        // Get components
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
@@ -29,14 +28,11 @@ public class SimpleWander : MonoBehaviour
             return;
         }
 
-        // Set agent properties
+
         agent.speed = agentSpeed;
         agent.acceleration = agentAcceleration;
-
-        // Disable automatic rotation to prevent snapping
         agent.updateRotation = false;
 
-        // Start wandering
         StartCoroutine(Wander());
     }
 
@@ -49,27 +45,24 @@ public class SimpleWander : MonoBehaviour
         {
             yield return new WaitForSeconds(wanderWaitTime);
 
-            // Get a random position on the NavMesh
             Vector3 wanderTarget = GetRandomNavMeshLocation();
             agent.SetDestination(wanderTarget);
 
             if (animator != null)
             {
-                animator.SetBool("Moving", true);  // Start moving animation
+                animator.SetBool("Moving", true); 
             }
 
-            // Wait until the agent reaches its destination
             while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
             {
                 yield return null;
             }
 
-            // Stop the agent's velocity to prevent sliding
             agent.velocity = Vector3.zero;
 
             if (animator != null)
             {
-                animator.SetBool("Moving", false);  // Stop moving animation
+                animator.SetBool("Moving", false); 
             }
         }
     }
@@ -94,7 +87,6 @@ public class SimpleWander : MonoBehaviour
     /// </summary>
     void Update()
     {
-        // If the agent is moving, smoothly rotate towards the movement direction
         if (agent.velocity != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(agent.velocity.normalized);
