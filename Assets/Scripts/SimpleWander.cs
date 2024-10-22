@@ -70,7 +70,7 @@ public class SimpleWander : MonoBehaviour
 
             if (objectToSpawn != null)
             {
-                Vector3 spawnPos = transform.position - transform.forward * (2); // TODO: add an arbitrary multiplier
+                Vector3 spawnPos = transform.position - transform.forward * (6); // TODO: add an arbitrary multiplier
                 Instantiate(objectToSpawn, spawnPos, Quaternion.identity);
             }
         }
