@@ -9,7 +9,10 @@ public class SimpleWander : MonoBehaviour
     public float wanderRadius = 10.0f;   
     public float agentSpeed = 6.0f;
     public float agentAcceleration = 8.0f;
-    public float rotationSpeed = 5.0f; 
+    public float rotationSpeed = 5.0f;
+
+    public GameObject objectToSpawn;
+
 
     private NavMeshAgent agent;
     private Animator animator;
@@ -63,6 +66,12 @@ public class SimpleWander : MonoBehaviour
             if (animator != null)
             {
                 animator.SetBool("Moving", false); 
+            }
+
+            if (objectToSpawn != null)
+            {
+                Vector3 spawnPos = transform.position - transform.forward * (2); // TODO: add an arbitrary multiplier
+                Instantiate(objectToSpawn, spawnPos, Quaternion.identity);
             }
         }
     }
