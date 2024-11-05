@@ -10,12 +10,22 @@ public class SimpleWander : MonoBehaviour
     public float agentSpeed = 6.0f;
     public float agentAcceleration = 8.0f;
     public float rotationSpeed = 5.0f;
+    public float modifier = 6.0f;
+    public float avoidDistance = 12.0f;
 
-    public GameObject objectToSpawn;
+    public float eggLayChance = 0.5f;
+    public float eggMultiplier = 2.0f;
+
+    public GameObject[] objectsToSpawn;
 
 
     private NavMeshAgent agent;
     private Animator animator;
+
+    [SerializeField]
+    private Transform player;
+
+    private Coroutine currentCoroutine;
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -36,7 +46,7 @@ public class SimpleWander : MonoBehaviour
         agent.acceleration = agentAcceleration;
         agent.updateRotation = false;
 
-        StartCoroutine(Wander());
+        currentCoroutine = StartCoroutine(Wander());
     }
 
     /// <summary>
@@ -68,12 +78,48 @@ public class SimpleWander : MonoBehaviour
                 animator.SetBool("Moving", false); 
             }
 
-            if (objectToSpawn != null)
+            if (Random.value < eggLayChance && objectsToSpawn.Length > 0)
             {
-                Vector3 spawnPos = transform.position - transform.forward * (2); // TODO: add an arbitrary multiplier
-                Instantiate(objectToSpawn, spawnPos, Quaternion.identity);
+                if (objectsToSpawn != null)
+                {
+                    int randomIndex = Random.Range(0, objectsToSpawn.Length);
+                    Vector3 spawnPos = transform.position - transform.forward * eggMultiplier;
+                    Instantiate(objectsToSpawn[randomIndex], spawnPos, Quaternion.identity);
+                }
             }
         }
+    }
+
+    IEnumerator Avoid()
+    {
+        Vector3 directionAwayFromPlayer = (transform.position - player.position).normalized;
+        agent.speed = agentSpeed * modifier;
+
+        Vector3 avoidTarget = transform.position + directionAwayFromPlayer * avoidDistance;
+
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(avoidTarget, out navHit, avoidDistance, NavMesh.AllAreas);
+
+        if (animator != null)
+        {
+            animator.SetBool("Moving", true);
+        }
+
+        agent.SetDestination(navHit.position);
+
+        while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        agent.velocity = Vector3.zero;
+
+        if (animator != null)
+        {
+            animator.SetBool("Moving", false);
+        }
+
+        currentCoroutine = StartCoroutine(Wander());
     }
 
     /// <summary>
@@ -96,6 +142,17 @@ public class SimpleWander : MonoBehaviour
     /// </summary>
     void Update()
     {
+        float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
+
+        if (distanceFromPlayer <= avoidDistance)
+        {
+            if (currentCoroutine != null)
+            {
+                StopCoroutine(currentCoroutine);
+            }
+            currentCoroutine = StartCoroutine(Avoid());
+        }
+
         if (agent.velocity != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(agent.velocity.normalized);
