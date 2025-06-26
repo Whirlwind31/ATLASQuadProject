@@ -13,6 +13,7 @@ public class NavMeshMovement : MonoBehaviour
     public float agentAcceleration = 8.0f;
     public float baitDetectionDistance = 6.0f;
     public float baitStopDistance = 6.0f;
+    public float baitCooldownTime = 1f; // in seconds
 
     private float baseSpeed; // used to remember the speed of the NavMesh agent
 
@@ -27,6 +28,7 @@ public class NavMeshMovement : MonoBehaviour
     private Coroutine currentCoroutine;
 
     private bool hasReachedBait = false; // indicates if the object has reached the bait
+    private bool immobileFromBait = false; // indicates if mammoth is slow to react after reaching bait
 
     // Variables used for the GameObject's avoiding behavior.
     private bool isAvoiding = false;
@@ -136,7 +138,7 @@ public class NavMeshMovement : MonoBehaviour
             animator.SetBool("Moving", true);
         }
 
-        // Debug.Log("Avoiding to: " + navHit.position);
+        Debug.Log("Avoiding to: " + navHit.position);
         agent.SetDestination(navHit.position);
 
         while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
@@ -168,6 +170,7 @@ public class NavMeshMovement : MonoBehaviour
     /// <returns></returns>
     IEnumerator MoveToBait()
     {
+        Debug.Log("Moving to bait");
         if (animator != null)
         {
             animator.SetBool("Moving", true);
@@ -190,8 +193,8 @@ public class NavMeshMovement : MonoBehaviour
         }
 
         hasReachedBait = true;
-
-        agent.enabled = false;
+        //agent.enabled = false;
+        Debug.Log("Done moving towards bait");
     }
 
     /// <summary>
@@ -216,13 +219,39 @@ public class NavMeshMovement : MonoBehaviour
     }
 
     /// <summary>
+    /// Helper method to temporarily prevent the mammoth from moving
+    /// after reaching its bait.
+    /// </summary>
+    IEnumerator BaitCooldown()
+    {
+        immobileFromBait = true;
+        float elapsedT = 0f;
+        while (elapsedT < baitCooldownTime)
+        {
+            elapsedT += Time.deltaTime;
+            yield return null;
+        }
+        immobileFromBait = false;
+    }
+
+    /// <summary>
     /// Update is called once per frame. It is used to check the distance between the player, 
     /// bait, and the GameObject.
     /// </summary>
     void Update()
     {
+        if (immobileFromBait)
+        {
+            return;
+        }
         if (hasReachedBait)
         {
+            hasReachedBait = false;
+            if (currentCoroutine != null)
+            {
+                StopCoroutine(currentCoroutine);
+            }
+            currentCoroutine = StartCoroutine(BaitCooldown());
             return;
         }
 
