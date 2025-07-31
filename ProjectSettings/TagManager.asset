@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Handtag
+  - EasterEggTree1
+  - EasterEggPaper
+  - EasterEggNarration2
+  - EasterEggNarration1
   layers:
   - Default
   - TransparentFX
