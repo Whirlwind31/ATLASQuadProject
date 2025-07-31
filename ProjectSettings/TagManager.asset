@@ -6,12 +6,9 @@ TagManager:
   tags:
   - Handtag
   - EasterEggTree1
-  - EasterEggTrigger1
-  - EasterEggNarration1
-  - EasterEggBuilding
-  - EasterEggTrigger2
-  - EasterEggNarration2
   - EasterEggPaper
+  - EasterEggNarration2
+  - EasterEggNarration1
   layers:
   - Default
   - TransparentFX

@@ -21,7 +21,7 @@ public class BoxScript : MonoBehaviour
                 nscript.EnableText();
 
                 EnableCollision ec = GameObject.FindWithTag("EasterEggTree1").GetComponent<EnableCollision>();
-                ec.disableCollision();
+                ec.DisableCollision();
             }
             else if (gameObject.CompareTag("EasterEggTrigger2"))
             {
@@ -30,7 +30,7 @@ public class BoxScript : MonoBehaviour
                 nscript.EnableText();
 
                 EnableCollision ec = GameObject.FindWithTag("EasterEggBuilding").GetComponent<EnableCollision>();
-                ec.disableCollision();
+                ec.DisableCollision();
             }    
         }
             

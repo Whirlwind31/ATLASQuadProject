@@ -4,19 +4,21 @@ using UnityEngine;
 
 public class EnableCollision : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private Collider c;
+
+    private void Awake()
     {
-        Collider c = gameObject.GetComponent<MeshCollider>();
+        c = gameObject.GetComponent<MeshCollider>();
         c.enabled = true;
     }
 
-    // Update is called once per frame
-    void Update() { }
-
-    public void disableCollision()
+    public void DisableCollision()
     {
-        Collider c = gameObject.GetComponent<MeshCollider>();
         c.enabled = false;
+    }
+
+    public void TurnOnCollision()
+    {
+        c.enabled = true;
     }
 }

@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using TMPro;
+using System.Xml;
 
-public class HideWithPaper : MonoBehaviour
+// Very similar script to HideWithPaper, except for TextMeshPro objects rather than gameObjects with mesh renderers.
+public class TextHideWithPaper : MonoBehaviour
 {
     [SerializeField] private GameObject paper;
     private int framesToEase = 60;
@@ -13,11 +16,11 @@ public class HideWithPaper : MonoBehaviour
     // Sets the gameObject's opacity to 0.
     private void Awake()
     {
-        Color c = gameObject.GetComponent<MeshRenderer>().material.color;
-        c.a = 0f;
+        TextMeshPro tmp = gameObject.GetComponent<TextMeshPro>();
+        tmp.color = new Color(tmp.color.r, tmp.color.g, tmp.color.b, 0f);
     }
 
-    // Fade in object (with an easing function) when paper is rotated rightside up.
+    // Fade in text (with an easing function) when paper is rotated rightside up.
     // Exclusively used with children of the Secret Paper family.
     void Update()
     {
@@ -29,9 +32,8 @@ public class HideWithPaper : MonoBehaviour
         else
             easingAnimationProgress = Mathf.Max(easingAnimationProgress - 1f / framesToEase, 0f);
 
-        Color c = gameObject.GetComponent<MeshRenderer>().material.color;
-        c.a = EasingFunction.EaseInOutCubic(0, 1, easingAnimationProgress);
-
-        gameObject.GetComponent<MeshRenderer>().material.color = c;
+        float alpha = EasingFunction.EaseInOutCubic(0, 1, easingAnimationProgress);
+        TextMeshPro tmp = GetComponent<TextMeshPro>();
+        tmp.color = new Color(tmp.color.r, tmp.color.g, tmp.color.b, alpha);
     }
 }
