@@ -145,7 +145,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
@@ -2186,7 +2186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pageNumber: 1
   minPageNo: 1
-  maxPageNo: 8
+  maxPageNo: 11
   dig: {fileID: 143570423}
 --- !u!114 &143570426
 MonoBehaviour:
@@ -3783,7 +3783,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: If you see this, the developer probably made an error somewhere.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 17cb884b1d29a3346b9cc9a9bbf4436e, type: 2}
   m_sharedMaterial: {fileID: 3242632319709377410, guid: 17cb884b1d29a3346b9cc9a9bbf4436e, type: 2}
@@ -4579,6 +4579,14 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b242d0666f04f5c4d92b90daa454dfb8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b242d0666f04f5c4d92b90daa454dfb8, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b242d0666f04f5c4d92b90daa454dfb8, type: 3}
+      propertyPath: m_StitchLightmapSeams
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b242d0666f04f5c4d92b90daa454dfb8, type: 3}
       propertyPath: m_Name
@@ -8287,8 +8295,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "S C A V E N G E R\r\n               H U N T\r\n\r\nYour task: Unscramb-
-    le the locations on the checklist. Enter them through the front.            More..."
+  m_text: "S C A V E N G E R\r\n               H U N T\r\n-[ ] soyne batbolroy\r\n-[
+    ] sherlow lahl\r\n-[ ] goose statue\r\n-[ ] collion tubs"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 17cb884b1d29a3346b9cc9a9bbf4436e, type: 2}
   m_sharedMaterial: {fileID: 3242632319709377410, guid: 17cb884b1d29a3346b9cc9a9bbf4436e, type: 2}
@@ -12099,7 +12107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
       propertyPath: Acceleration
-      value: 3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 11400010, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
       propertyPath: SnapRotation
@@ -14486,8 +14494,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "LINCOLN BUST\n\tGreat job for making it this far!\n\nThere is just one
-    more thing you must do. Approach my younger self's nose..."
+  m_text: 'Great job for making it this far! There is just one more thing that you
+    must do.
+
+
+    Bring the checklist to my smaller self''s nose...'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 17cb884b1d29a3346b9cc9a9bbf4436e, type: 2}
   m_sharedMaterial: {fileID: 3242632319709377410, guid: 17cb884b1d29a3346b9cc9a9bbf4436e, type: 2}
@@ -15387,7 +15398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pageNumber: 1
   minPageNo: 1
-  maxPageNo: 14
+  maxPageNo: 19
   dig: {fileID: 1546849975}
 --- !u!114 &1546849975
 MonoBehaviour:
@@ -20577,7 +20588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pageNumber: 1
   minPageNo: 1
-  maxPageNo: 12
+  maxPageNo: 17
   dig: {fileID: 2052679763}
 --- !u!114 &2052679765
 MonoBehaviour:
