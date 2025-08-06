@@ -97,6 +97,7 @@ public class SecretProgression : MonoBehaviour
         thisChapter = 6;
 
         ch3Text.AdvanceChecklist();
+        gooseSensor.GetComponent<SensorColor>().FoundSensor();
         lincolnOnePager.SetActive(true);
         insideLincolnSensor.SetActive(true);
         insideLincolnTable.SetActive(true);
@@ -108,12 +109,14 @@ public class SecretProgression : MonoBehaviour
         thisChapter = 7;
 
         ch3Text.AdvanceChecklist();
+        insideLincolnSensor.GetComponent<SensorColor>().FoundSensor();
         lincolnNoseSensor.SetActive(true);
     }
 
     private void FinishHunt()
     {
         Debug.Log("Hunt complete!");
+        lincolnNoseSensor.GetComponent<SensorColor>().FoundSensor();
         thisChapter = 8;
         ch3Text.AdvanceChecklist();
     }
@@ -122,7 +125,7 @@ public class SecretProgression : MonoBehaviour
     // Checks for the "invitation system" required to progress between levels in the scavenger hunt.
     private void Update()
     {
-        if (thisChapter >= 3 && ch3Paper.GetComponent<DetectIfGrabbed>().IsGrabbed && ch3Paper.GetComponent<PageNo>().pageNumber == 6)
+        if (thisChapter >= 3 && ch3Paper.GetComponent<DetectIfGrabbed>().IsGrabbed && ch3Paper.GetComponent<PageNo>().pageNumber == 9)
         {
             // If the 1st condition is not met, the 2nd one is skipped.
             // This is especially relevant because distance calculations might be computationally expensive!
@@ -139,10 +142,10 @@ public class SecretProgression : MonoBehaviour
                 FinishHunt();
         }
         
-        if (thisChapter == 1 && ch1Paper.GetComponent<DetectIfGrabbed>().IsGrabbed && ch1Paper.GetComponent<PageNo>().pageNumber == 6 && 
+        if (thisChapter == 1 && ch1Paper.GetComponent<DetectIfGrabbed>().IsGrabbed && ch1Paper.GetComponent<PageNo>().pageNumber == 9 && 
             Vector3.Distance(ch1Paper.transform.position, ch2Table.transform.position) < 20f) 
                 GoToLevel2();
-        if (thisChapter == 2 && ch2Paper.GetComponent<DetectIfGrabbed>().IsGrabbed && ch2Paper.GetComponent<PageNo>().pageNumber == 6 &&
+        if (thisChapter == 2 && ch2Paper.GetComponent<DetectIfGrabbed>().IsGrabbed && ch2Paper.GetComponent<PageNo>().pageNumber == 7 &&
             Vector3.Distance(ch2Paper.transform.position, ch3Table.transform.position) < 20f)
                 GoToLevel3();
     }
