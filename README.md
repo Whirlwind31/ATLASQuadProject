@@ -1,1 +1,1 @@
-Spring 2024 Semester Project for ATLAS VR
+Fall 2025 Semester Project for ATLAS VR
