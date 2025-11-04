@@ -13,11 +13,21 @@ public class MetaStringInteraction : MonoBehaviour
     private Transform stringEndPoint;
 
     [Header("Interaction")]
-    // We need a reference to the Grabbable component to know when it's grabbed.
     [SerializeField]
     private Grabbable grabbable;
 
-    private Transform interactorTransform = null; // To store the grabbing hand's transform
+    [Tooltip("Drag your LeftHandAnchor's 'Hand Grab Interactor' GameObject here")]
+    [SerializeField]
+    private GrabInteractor leftHandGrabInteractor;
+
+    [Tooltip("Drag your RightHandAnchor's 'Hand Grab Interactor' GameObject here")]
+    [SerializeField]
+    private GrabInteractor rightHandGrabInteractor;
+
+    private int _leftHandId = -1;
+    private int _rightHandId = -1;
+
+    private Transform interactorTransform = null;
     private bool isGrabbed = false;
     private int _interactorId = -1;
 
@@ -35,8 +45,9 @@ public class MetaStringInteraction : MonoBehaviour
     public Transform StringStartTransform => stringStartPoint;
     public Transform StringEndTransform => stringEndPoint;
 
-    // Event raised when PullAmount changes (useful for other systems to react).
     public event Action<float> PullAmountChanged;
+
+    public event Action<float> OnStringReleased;
 
     void Awake()
     {
@@ -45,6 +56,16 @@ public class MetaStringInteraction : MonoBehaviour
         {
             grabbable = GetComponent<Grabbable>();
         }
+
+        if (leftHandGrabInteractor != null)
+        {
+            _leftHandId = leftHandGrabInteractor.Identifier;
+        }
+        if (rightHandGrabInteractor != null)
+        {
+            _rightHandId = rightHandGrabInteractor.Identifier;
+        }
+
     }
 
     // Editor-time quick validation of fields
@@ -92,36 +113,40 @@ public class MetaStringInteraction : MonoBehaviour
 
     private void HandlePointerEvent(PointerEvent pointerEvent)
     {
+        int eventId = pointerEvent.Identifier;
+
         switch (pointerEvent.Type)
         {
             case PointerEventType.Select:
-                // This is the equivalent of OnSelectEntered
-                isGrabbed = true;
-
-                // Store the ID of the pointer so we can check it on Unselect
-                _interactorId = pointerEvent.Identifier;
-
-                // Try to get the hand transform from pointerEvent.Data if possible
-                _interactorId = pointerEvent.Identifier;
-                if (pointerEvent.Data is Transform pointerTransform)
+                // Check if the event ID matches one of our known hands
+                if (eventId == _leftHandId)
                 {
-                    interactorTransform = pointerTransform;
+                    isGrabbed = true;
+                    _interactorId = eventId;
+                    // Store the TRANSFORM from the interactor
+                    interactorTransform = leftHandGrabInteractor.transform;
                 }
-                else
+                else if (eventId == _rightHandId)
                 {
-                    interactorTransform = null;
-                    Debug.LogWarning("Select event received with a null pointer transform in Data.", this);
+                    isGrabbed = true;
+                    _interactorId = eventId;
+                    // Store the TRANSFORM from the interactor
+                    interactorTransform = rightHandGrabInteractor.transform;
                 }
                 break;
 
             case PointerEventType.Unselect:
                 // Check if the pointer unselecting is the same one we are tracking
-                if (pointerEvent.Identifier == _interactorId)
+                if (eventId == _interactorId)
                 {
-                    // This is the equivalent of OnSelectExited
                     isGrabbed = false;
-                    interactorTransform = null; // Clear the transform reference
-                    _interactorId = -1; // Reset the ID
+                    interactorTransform = null;
+                    _interactorId = -1;
+
+                    // --- ADD THIS LINE ---
+                    // Fire the release event with the last known pull amount before resetting
+                    OnStringReleased?.Invoke(PullAmount);
+
                     SetPullAmount(0f);
                 }
                 break;
@@ -183,11 +208,9 @@ public class MetaStringInteraction : MonoBehaviour
         }
         else
         {
-            PullAmount = value; // keep consistent even if small change
+            PullAmount = value;
         }
     }
-
-    // This function is identical to the one in the tutorial. No changes needed.
     private float CalculatePull(Vector3 pullPosition)
     {
         if (stringStartPoint == null || stringEndPoint == null) return 0f;

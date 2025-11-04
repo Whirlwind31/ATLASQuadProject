@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.55021423, g: 0.50685334, b: 0.44964263, a: 1}
+  m_IndirectSpecularColor: {r: 0.5502142, g: 0.5068534, b: 0.44964263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -21635,7 +21635,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2aa0b30a7ba3e0c43a1b56718a94e644, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  torus_prefab: {fileID: 4840313705835279752, guid: 46d90e0e0ffd67d4fa4b8d141cdc3d7f, type: 3}
+  torus_prefab: {fileID: 340056104}
   hasCollided: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
