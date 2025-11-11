@@ -16,6 +16,8 @@ public class SnapBlock : MonoBehaviour
 
     // Per-group piece count, keyed by that group's middle Rigidbody
     private static Dictionary<Rigidbody, int> groupPieceCounts = new Dictionary<Rigidbody, int>();
+    // Track what kinds of parts are attached per middle
+    private static Dictionary<Rigidbody, HashSet<string>> groupPieceTypes = new Dictionary<Rigidbody, HashSet<string>>();
 
 
     private void OnTriggerStay(Collider other)
@@ -41,6 +43,51 @@ public class SnapBlock : MonoBehaviour
         {
             Debug.LogWarning($"[SnapBlock] {gameObject.name} could not find a valid 'middle' for {letterKey}");
             return;
+        }
+
+        // ---------------------------
+        // CHECK LETTER COMPATIBILITY HERE (AFTER ROOT FOUND)
+        // ---------------------------
+        string myLetter = ExtractLetterKey(gameObject.name);
+        string rootLetter = ExtractLetterKey(rootRb.name);
+
+        if (string.IsNullOrEmpty(myLetter) || string.IsNullOrEmpty(rootLetter) || myLetter != rootLetter)
+        {
+            Debug.Log($"[SnapBlock] {gameObject.name} and {rootRb.name} are from different letters ({myLetter} vs {rootLetter})");
+            return;
+        }
+
+        // ---------------------------
+        // LETTER-SPECIFIC CONNECTION RULES (AFTER LETTER VERIFIED)
+        // ---------------------------
+        string pieceRole = ExtractPieceRole(gameObject.name);
+        if (!groupPieceTypes.ContainsKey(rootRb))
+        {
+            // Initialize with middle pre-registered since root is always the middle
+            groupPieceTypes[rootRb] = new HashSet<string> { "middle" };
+        }
+
+        var attachedTypes = groupPieceTypes[rootRb];
+
+        // Skip adding middle again — root already represents it
+        if (pieceRole == "middle")
+        {
+            Debug.Log($"[SnapBlock] {gameObject.name} is the root middle; skipping duplicate registration.");
+        }
+        else
+        {
+            // Letter-specific restrictions
+            if (letterKey == "l")
+            {
+                if (attachedTypes.Contains(pieceRole))
+                {
+                    Debug.LogWarning($"[SnapBlock] {rootRb.name} already has a '{pieceRole}' attached. Duplicate prevented.");
+                    return;
+                }
+            }
+
+            // Register new piece type
+            attachedTypes.Add(pieceRole);
         }
 
         // ---------------------------
@@ -112,12 +159,12 @@ public class SnapBlock : MonoBehaviour
         groupPieceCounts[rootRb] = count;
         Debug.Log($"[SnapBlock] {rootRb.name} now has {count} parts attached.");
 
-        // When this middle has all three pieces (top/middle/bottom)
         if (count >= 3)
         {
             groupPieceCounts[rootRb] = 0;
             MergeAssembly(rootRb);
         }
+
 
         Physics.SyncTransforms();
     }
@@ -146,30 +193,48 @@ public class SnapBlock : MonoBehaviour
 
     private IEnumerator DelayedJointAttach(Rigidbody myRb, Rigidbody rootRb)
     {
-        // Wait one fixed frame so XR release & physics sync
+        // Wait one physics frame so XR release & physics settle
         yield return new WaitForFixedUpdate();
 
-        // Recheck validity before creating the joint
+        // Safety checks
         if (myRb == null || rootRb == null) yield break;
         if (myRb == rootRb) yield break;
 
-        // Create the joint cleanly after release
+        // Create or reuse FixedJoint
         FixedJoint joint = myRb.GetComponent<FixedJoint>();
         if (joint == null)
             joint = myRb.gameObject.AddComponent<FixedJoint>();
 
+        // Attach and lock parameters
         joint.connectedBody = rootRb;
         joint.breakForce = Mathf.Infinity;
         joint.breakTorque = Mathf.Infinity;
 
-        Debug.Log($"[SnapBlock] Delayed joint successfully attached between {myRb.name} and {rootRb.name}.");
+        // === Key stiffness settings ===
+        joint.enablePreprocessing = false;     // removes internal damping & relaxation
+        joint.enableCollision = false;         // prevents collision jitter between linked parts
+        joint.massScale = 1f;                  // keep equal mass balance
+        joint.connectedMassScale = 0.5f;         // same for other side
+
+        // === Optional physics solver tuning (stronger constraints) ===
+        myRb.solverIterations = 40;
+        myRb.solverVelocityIterations = 40;
+        rootRb.solverIterations = 40;
+        rootRb.solverVelocityIterations = 40;
+
+        Debug.Log($"[SnapBlock] FixedJoint created rigidly between {myRb.name} and {rootRb.name}");
     }
+
 
     // ---------------------------
     // FIND THE CORRECT "MIDDLE" BLOCK
     // ---------------------------
     private Rigidbody FindRootMiddle(string letterKey, Rigidbody self, Transform targetSnap)
     {
+        // If this object itself is the middle block, use it as the root
+        if (self.name.ToLower().Contains("middle"))
+            return self;
+
         Rigidbody rootRb = null;
 
         // 1. Search nearby colliders for a "middle" of same letter
@@ -236,6 +301,15 @@ public class SnapBlock : MonoBehaviour
         return "";
     }
 
+    private string ExtractPieceRole(string name)
+    {
+        string lower = name.ToLower();
+        if (lower.Contains("top")) return "top";
+        if (lower.Contains("bottom")) return "bottom";
+        if (lower.Contains("middle")) return "middle";
+        return "unknown";
+    }
+
 
     // ---------------------------
     // DISABLE XR GRABBING LOGIC
@@ -268,15 +342,18 @@ public class SnapBlock : MonoBehaviour
         FixedJoint[] joints = rootRb.GetComponentsInChildren<FixedJoint>(true);
         foreach (FixedJoint j in joints)
         {
-            if (j != null && j.connectedBody == rootRb)
-            {
-                Rigidbody childRb = j.GetComponent<Rigidbody>();
-                if (childRb != null && childRb != rootRb)
-                {
-                    StartCoroutine(SafeDestroyRigid(childRb, j));
-                }
-            }
+            if (j == null || j.connectedBody != rootRb) continue;
+
+            Rigidbody childRb = j.GetComponent<Rigidbody>();
+            if (childRb == null || childRb == rootRb) continue;
+
+            // Prevent deleting the real middle block
+            if (childRb.name.ToLower().Contains("middle")) continue;
+
+            Destroy(j);
+            Destroy(childRb);
         }
+
 
         rootRb.mass = 3f;
         rootRb.drag = linearDamping;
@@ -286,26 +363,6 @@ public class SnapBlock : MonoBehaviour
 
         Debug.Log("[SnapBlock] Assembly unified successfully.");
     }
-
-    private IEnumerator SafeDestroyRigid(Rigidbody childRb, FixedJoint joint)
-    {
-        // Give Unity one full physics frame to stabilize XR and collider refs
-        yield return new WaitForFixedUpdate();
-
-        // Verify objects still exist before destroying
-        if (joint != null)
-            Destroy(joint);
-
-        if (childRb != null)
-        {
-            childRb.isKinematic = true;
-            childRb.useGravity = false;
-            yield return null; // one more frame
-            Destroy(childRb);
-        }
-    }
-
-
 
     // ---------------------------
     // COLLISION DAMPENER
