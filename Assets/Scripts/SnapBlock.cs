@@ -79,6 +79,47 @@ public class SnapBlock : MonoBehaviour
             // Letter-specific restrictions
             if (letterKey == "l")
             {
+                string snapName = targetSnap.name.ToLower();
+
+                // bottom piece may only attach to a snap named "bottom"
+                if (pieceRole == "bottom" && !snapName.Contains("bottom"))
+                {
+                    Debug.Log($"[SnapBlock] {gameObject.name} cannot attach to '{targetSnap.name}' (needs bottom snap).");
+                    return;
+                }
+
+                // top piece may only attach to a snap named "top"
+                if (pieceRole == "top" && !snapName.Contains("top"))
+                {
+                    Debug.Log($"[SnapBlock] {gameObject.name} cannot attach to '{targetSnap.name}' (needs top snap).");
+                    return;
+                }
+
+                if (attachedTypes.Contains(pieceRole))
+                {
+                    Debug.LogWarning($"[SnapBlock] {rootRb.name} already has a '{pieceRole}' attached. Duplicate prevented.");
+                    return;
+                }
+            }
+
+            if (letterKey == "n")
+            {
+                string snapName = targetSnap.name.ToLower();
+
+                // bottom piece may only attach to a snap named "bottom"
+                if (pieceRole == "bottom" && !snapName.Contains("bottom"))
+                {
+                    Debug.Log($"[SnapBlock] {gameObject.name} cannot attach to '{targetSnap.name}' (needs bottom snap).");
+                    return;
+                }
+
+                // top piece may only attach to a snap named "top"
+                if (pieceRole == "top" && !snapName.Contains("top"))
+                {
+                    Debug.Log($"[SnapBlock] {gameObject.name} cannot attach to '{targetSnap.name}' (needs top snap).");
+                    return;
+                }
+
                 if (attachedTypes.Contains(pieceRole))
                 {
                     Debug.LogWarning($"[SnapBlock] {rootRb.name} already has a '{pieceRole}' attached. Duplicate prevented.");
