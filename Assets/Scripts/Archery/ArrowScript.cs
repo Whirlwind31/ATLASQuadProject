@@ -1,31 +1,24 @@
 using UnityEngine;
-using Oculus.Interaction; // For Grabbable
+using Oculus.Interaction;
+using System.Collections;
 
 [RequireComponent(typeof(Grabbable), typeof(Rigidbody), typeof(Collider))]
 public class Arrow : MonoBehaviour
 {
-    [Tooltip("How much to multiply the 0-1 pull value by for force")]
-    [SerializeField]
-    private float firePowerMultiplier = 20f;
+    [SerializeField] private float firePowerMultiplier = 20f;
 
     private Rigidbody rb;
     private Grabbable grabbable;
     private Collider col;
 
     public bool IsHeldByHand { get; private set; } = false;
+    public bool IsNocked { get; private set; } = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         grabbable = GetComponent<Grabbable>();
         col = GetComponent<Collider>();
-    }
-
-    private void Start()
-    {
-        // Start with physics off
-        rb.isKinematic = true;
-        rb.useGravity = false;
     }
 
     private void OnEnable()
@@ -44,8 +37,13 @@ public class Arrow : MonoBehaviour
         {
             IsHeldByHand = true;
 
-            // When we pick up the arrow, re-enable physics
-            // so it doesn't just float in the air if we drop it
+            // If we grab the arrow while it's nocked, we "Un-Nock" it
+            if (IsNocked)
+            {
+                UnNock();
+            }
+
+            // Ensure physics are ready for holding
             rb.isKinematic = false;
             rb.useGravity = true;
         }
@@ -58,63 +56,63 @@ public class Arrow : MonoBehaviour
     // Called by BowController when arrow is nocked
     public void Nock(Transform nockPoint)
     {
-        // We've been nocked, so we are no longer "held"
         IsHeldByHand = false;
+        IsNocked = true;
 
-        // Disable the grabbable so the player can't accidentally grab it
-        grabbable.enabled = false;
+        // NOTE: We do NOT disable grabbable anymore, so you can take it off!
+        // grabbable.enabled = false; 
 
-        // Turn off physics
+        // Turn off physics so it sticks to the bow
         rb.isKinematic = true;
         rb.useGravity = false;
 
-        // Parent to the nock point and snap into position
+        // Attach to string
         transform.SetParent(nockPoint);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
     }
 
-    // Called by BowController when string is released
+    // New function to handle taking the arrow OFF the string
+    public void UnNock()
+    {
+        IsNocked = false;
+        transform.SetParent(null); // Detach from bow
+
+        // Reset physics
+        rb.isKinematic = false;
+        rb.useGravity = true;
+    }
+
     public void Fire(Vector3 fireDirection, float pullValue)
     {
-        // Unparent from the bow
+        IsNocked = false;
         transform.SetParent(null);
 
-        // Turn physics back on
         rb.isKinematic = false;
         rb.useGravity = true;
 
-        // Apply force
         float fireForce = pullValue * firePowerMultiplier;
         rb.AddForce(fireDirection * fireForce, ForceMode.Impulse);
-
-        // Make it point in the direction it's flying
         transform.rotation = Quaternion.LookRotation(rb.velocity);
 
-        // Disable the collider for a split second to avoid hitting the bow
-        StartCoroutine(BrieflyDisableCollider());
+        StartCoroutine(BrieflyDisableCollider(0.1f));
     }
 
-    // Stick in surfaces
+    // ... (Collision and IEnumerator code stays the same) ...
     private void OnCollisionEnter(Collision collision)
     {
-        // Only stick if we are moving fast and haven't been nocked
-        if (rb.velocity.magnitude > 0.5f && !isKinematic)
+        if (rb.velocity.magnitude > 0.5f && !IsNocked && !rb.isKinematic)
         {
-            // Stop moving and stick to the object
             rb.isKinematic = true;
             rb.useGravity = false;
             transform.SetParent(collision.transform);
         }
     }
 
-    private System.Collections.IEnumerator BrieflyDisableCollider()
+    private IEnumerator BrieflyDisableCollider(float duration)
     {
         col.enabled = false;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(duration);
         col.enabled = true;
     }
-
-    // Helper property
-    private bool isKinematic => rb.isKinematic;
 }
