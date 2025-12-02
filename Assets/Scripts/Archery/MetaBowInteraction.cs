@@ -1,8 +1,5 @@
-using System; // Needed for Action
+using System;
 using UnityEngine;
-
-// Note: We don't need 'Oculus.Interaction' in this script
-// because it only talks to our other scripts.
 
 public class BowController : MonoBehaviour
 {
@@ -14,6 +11,10 @@ public class BowController : MonoBehaviour
     [Tooltip("The empty GameObject where the arrow snaps to")]
     [SerializeField]
     private Transform nockPoint;
+
+    [Tooltip("The same object used as the Direction Reference on the String (e.g., PullDirectionGuide)")]
+    [SerializeField]
+    private Transform fireDirectionGuide; // <--- NEW/UPDATED FOR LAUNCH FIX
 
     [Header("Bow Visuals")]
     [Tooltip("Top part of the bow that will bend")]
@@ -27,10 +28,6 @@ public class BowController : MonoBehaviour
     [Tooltip("How much the limbs should bend at full pull")]
     [SerializeField]
     private float maxLimbBend = 30f; // Max rotation in degrees
-
-    [Tooltip("How far back the nock point moves at full pull")]
-    [SerializeField]
-    private float maxPullDistance = 0.5f; // In meters
 
     // Private State
     private Arrow currentArrow = null;
@@ -66,16 +63,16 @@ public class BowController : MonoBehaviour
         }
     }
 
-    // This is called by the NockSocket script (see Step 3)
+    // This is called by the NockSocket script
     public void NockArrow(Arrow arrow)
     {
-        if (isArrowNocked) return; // Already have an arrow
+        if (isArrowNocked) return;
 
         Debug.Log("Arrow Nocked!");
         currentArrow = arrow;
         isArrowNocked = true;
 
-        // Tell the arrow it's nocked (this will disable its physics/grab)
+        // Tell the arrow it's nocked (disables its physics/grab)
         currentArrow.Nock(nockPoint);
     }
 
@@ -85,21 +82,22 @@ public class BowController : MonoBehaviour
         // 1. Bend the limbs
         if (topLimb != null)
         {
-            // Rotates top limb forward (around X-axis)
             topLimb.localRotation = Quaternion.Euler(pullAmount * maxLimbBend, 0, 0);
         }
         if (bottomLimb != null)
         {
-            // Rotates bottom limb forward (around X-axis)
             bottomLimb.localRotation = Quaternion.Euler(pullAmount * -maxLimbBend, 0, 0);
         }
 
-        // 2. Move the nock point (and the attached arrow)
+        // Note: Moving the nockPoint is handled by the String's constrained transform
+        // if NockSocket is a child of the String. This code is generally now redundant/safe to remove.
+        /*
         if (nockPoint != null)
         {
-            // Moves nock point back (along Z-axis)
-            nockPoint.localPosition = nockRestLocalPosition + Vector3.back * pullAmount * maxPullDistance;
+             nockPoint.localPosition = nockRestLocalPosition + Vector3.back * pullAmount * maxPullDistance;
         }
+        */
+
     }
 
     // Called once when the string is released
@@ -112,11 +110,20 @@ public class BowController : MonoBehaviour
             return;
         }
 
+        // Determine the launch direction: 
+        // Use the manually aligned guide's forward vector if set, otherwise fallback to nockPoint.
+        Vector3 launchDirection = nockPoint.forward;
+
+        if (fireDirectionGuide != null)
+        {
+            // *** CRITICAL FIX: Use the Direction Guide for launch direction ***
+            launchDirection = fireDirectionGuide.forward;
+        }
+
         Debug.Log("Firing arrow with power: " + finalPullAmount);
 
         // Tell the arrow to fly
-        // We use nockPoint.forward because that's the direction the arrow is pointing
-        currentArrow.Fire(nockPoint.forward, finalPullAmount);
+        currentArrow.Fire(launchDirection, finalPullAmount);
 
         // Reset state
         isArrowNocked = false;
