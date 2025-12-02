@@ -20,10 +20,16 @@ public class EndSnap : MonoBehaviour
     [Tooltip("Invoked once when all blocks are snapped.")]
     public UnityEvent onAllBlocksSnapped;
 
+    [Tooltip("Reference to the 'SF_Rainbow' object that is hidden.")]
+    public GameObject rainbowEffectObject;
+
     private bool hasSnappedToWall = false;
 
     // Global count of how many blocks have finished snapping
     private static int globalSnappedCount = 0;
+
+    private static HashSet<Transform> occupiedSlots = new HashSet<Transform>();
+
 
     // ---------------------------
     // TRIGGER HANDLING
@@ -34,6 +40,8 @@ public class EndSnap : MonoBehaviour
         if (!other.CompareTag("EndSnapPoint")) return;
 
         Transform targetSnap = other.transform;
+
+        if (occupiedSlots.Contains(targetSnap)) return;  // slot already used
 
         // Use the root rigidbody of this block
         Rigidbody myRb = GetComponent<Rigidbody>();
@@ -49,6 +57,16 @@ public class EndSnap : MonoBehaviour
 
         float distance = Vector3.Distance(myRb.transform.position, targetSnap.position);
         if (distance > snapDistance) return;
+
+        // ---------------------------
+        // FULL ASSEMBLY CHECK
+        // ---------------------------
+        if (!SnapBlock.groupPieceCounts.TryGetValue(myRb, out int pieceCount) || pieceCount < 2)
+        {
+            // This block is not fully assembled (middle only or missing pieces)
+            Debug.Log($"[EndSnap] {myRb.name} rejected — only {pieceCount}/2 pieces attached.");
+            return;
+        }
 
         // ---------------------------
         // LETTER COMPATIBILITY CHECK
@@ -84,6 +102,18 @@ public class EndSnap : MonoBehaviour
         hasSnappedToWall = true;
 
         Debug.Log($"[EndSnap] Snapping {rb.name} to end marker {targetSnap.name}");
+
+        occupiedSlots.Add(targetSnap);
+
+        // Optional: disable the snap collider after use
+        Collider snapCol = targetSnap.GetComponent<Collider>();
+        if (snapCol != null) snapCol.enabled = false;
+
+        Collider[] allCols = rb.GetComponentsInChildren<Collider>(true);
+        foreach (Collider col in allCols)
+        {
+            col.enabled = false;
+        }
 
         // 1. Disable grabbing scripts so the player can't pull it off
         DisableGrabInteractions(rb.gameObject);
@@ -135,6 +165,18 @@ public class EndSnap : MonoBehaviour
         if (globalSnappedCount >= totalBlocksRequired)
         {
             Debug.Log("[EndSnap] All blocks snapped! Triggering final event.");
+
+            // Use the direct reference instead of GameObject.Find()
+            if (rainbowEffectObject != null)
+            {
+                rainbowEffectObject.SetActive(true); // This will now work!
+            }
+            else
+            {
+                Debug.LogWarning($"[EndSnap] {gameObject.name} is missing the 'Rainbow Effect Object' reference in the Inspector!");
+            }
+
+            // This event will now work because the object was just activated
             onAllBlocksSnapped?.Invoke();
         }
     }
@@ -160,7 +202,17 @@ public class EndSnap : MonoBehaviour
             return parts[2];  // "i"
         }
 
-        return "";
+        // --- NEW, MORE ROBUST RULE ---
+        // Handles simpler names like "EndSnapPoint-i" or "Target-l"
+        // It looks for a single letter as the *last* part of the name.
+        if (parts.Length > 1 && parts[parts.Length - 1].Length == 1)
+        {
+            // Grabs the last part if it's a single character
+            return parts[parts.Length - 1];
+        }
+        // --- END NEW RULE ---
+
+        return ""; // Return empty if no known pattern matches
     }
 
 

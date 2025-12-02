@@ -15,13 +15,16 @@ public class SnapBlock : MonoBehaviour
     private FixedJoint joint;
 
     // Per-group piece count, keyed by that group's middle Rigidbody
-    private static Dictionary<Rigidbody, int> groupPieceCounts = new Dictionary<Rigidbody, int>();
+    public static Dictionary<Rigidbody, int> groupPieceCounts = new Dictionary<Rigidbody, int>();
     // Track what kinds of parts are attached per middle
     private static Dictionary<Rigidbody, HashSet<string>> groupPieceTypes = new Dictionary<Rigidbody, HashSet<string>>();
 
 
     private void OnTriggerStay(Collider other)
     {
+        // Middle pieces are "receivers" only, they don't initiate snaps.
+        if (ExtractPieceRole(gameObject.name) == "middle") return;
+
         if (hasSnapped) return;
         if (!other.CompareTag("SnapPoint")) return;
 
