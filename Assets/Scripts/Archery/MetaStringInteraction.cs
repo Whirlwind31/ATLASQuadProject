@@ -57,45 +57,53 @@ public class MetaStringInteraction : MonoBehaviour
     {
         if (topLimbPos == null || bottomLimbPos == null) return;
 
-        // 1. Determine which object defines "Forward"
-        // If you assigned a Direction Reference, use it. Otherwise, use the Parent.
-        Transform referenceFrame = directionReference != null ? directionReference : transform.parent;
-
-        if (referenceFrame == null) return;
-
-        // --- 2. Calculate the "Rail" Center ---
+        // 1. Calculate the World Rest Position (Center of Limbs)
         Vector3 worldRestPos = (topLimbPos.position + bottomLimbPos.position) / 2f;
+        Vector3 finalStringPos = worldRestPos; // Default position is the rest position
 
-        // --- 3. Calculate the Constrained Position ---
-        // Convert Hand position to the Reference Frame's local space
-        Vector3 localHandPos = referenceFrame.InverseTransformPoint(transform.position);
-        Vector3 localRestPos = referenceFrame.InverseTransformPoint(worldRestPos);
-
-        // MAGIC LINE: Keep Hand's Z (Depth), Force X and Y to match Center
-        Vector3 constrainedLocalPos = new Vector3(localRestPos.x, localRestPos.y, localHandPos.z);
-
-        // Clamp Z: Stop string from going forward through the bow
-        // (Assumes Z+ is backward. If Z+ is forward, flip the sign of this check)
-        if (constrainedLocalPos.z > localRestPos.z)
+        // Check if the string is actively being pulled by a hand
+        if (grabbable.GrabPoints.Count > 0)
         {
-            constrainedLocalPos.z = localRestPos.z;
+            // --- A. String is actively grabbed, calculate the constrained position ---
+
+            Transform referenceFrame = directionReference != null ? directionReference : transform.parent;
+            if (referenceFrame == null) return;
+
+            // Convert Hand position to the Reference Frame's local space
+            Vector3 localHandPos = referenceFrame.InverseTransformPoint(transform.position);
+            Vector3 localRestPos = referenceFrame.InverseTransformPoint(worldRestPos);
+
+            // Constrain movement to the Z-Axis rail
+            Vector3 constrainedLocalPos = new Vector3(localRestPos.x, localRestPos.y, localHandPos.z);
+
+            // Clamp: Stop string from being pushed through the bow handle
+            if (constrainedLocalPos.z > localRestPos.z)
+            {
+                constrainedLocalPos.z = localRestPos.z;
+            }
+
+            // Set final position to the constrained position
+            finalStringPos = referenceFrame.TransformPoint(constrainedLocalPos);
+
+            // Calculate Pull Amount 
+            float distance = Vector3.Distance(worldRestPos, finalStringPos);
+            currentPullValue = Mathf.Clamp01(distance / maxPullDistance);
+            PullAmountChanged?.Invoke(currentPullValue);
+        }
+        else
+        {
+            // --- B. String is released, set current position and pull amount to 0 ---
+            // finalStringPos remains at worldRestPos (set above)
+            currentPullValue = 0f;
+            PullAmountChanged?.Invoke(0f);
         }
 
-        // Convert back to World Space
-        Vector3 constrainedWorldPos = referenceFrame.TransformPoint(constrainedLocalPos);
+        // --- 2. FORCE THE OBJECT TO ITS FINAL POSITION (Rest or Constrained) ---
+        transform.position = finalStringPos;
 
-        // --- 4. FORCE THE OBJECT TO THE RAIL ---
-        transform.position = constrainedWorldPos;
-
-        // --- 5. Update Visuals ---
+        // --- 3. Update Visuals ---
         lineRenderer.SetPosition(0, topLimbPos.position);
-        lineRenderer.SetPosition(1, constrainedWorldPos);
+        lineRenderer.SetPosition(1, finalStringPos);
         lineRenderer.SetPosition(2, bottomLimbPos.position);
-
-        // --- 6. Calculate Pull Amount ---
-        float distance = Vector3.Distance(worldRestPos, constrainedWorldPos);
-        currentPullValue = Mathf.Clamp01(distance / maxPullDistance);
-
-        PullAmountChanged?.Invoke(currentPullValue);
     }
 }

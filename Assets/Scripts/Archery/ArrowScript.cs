@@ -13,6 +13,7 @@ public class Arrow : MonoBehaviour
 
     public bool IsHeldByHand { get; private set; } = false;
     public bool IsNocked { get; private set; } = false;
+    public bool HasLaunched { get; private set; } = false;
 
     private void Awake()
     {
@@ -93,7 +94,8 @@ public class Arrow : MonoBehaviour
 
         float fireForce = pullValue * firePowerMultiplier;
         rb.AddForce(fireDirection * fireForce, ForceMode.Impulse);
-        transform.rotation = Quaternion.LookRotation(rb.velocity);
+
+        HasLaunched = true;
 
         StartCoroutine(BrieflyDisableCollider(0.1f));
     }
@@ -114,5 +116,18 @@ public class Arrow : MonoBehaviour
         col.enabled = false;
         yield return new WaitForSeconds(duration);
         col.enabled = true;
+    }
+
+    private void FixedUpdate()
+    {
+        // Only run if the arrow has been launched and is not resting on something
+        if (HasLaunched && !rb.isKinematic && rb.velocity.sqrMagnitude > 0.01f)
+        {
+            // Create a rotation that looks in the direction of the current velocity
+            Quaternion lookRotation = Quaternion.LookRotation(rb.velocity);
+
+            // Smoothly apply the rotation
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.fixedDeltaTime * 15f);
+        }
     }
 }
