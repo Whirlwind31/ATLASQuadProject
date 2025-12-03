@@ -1,6 +1,7 @@
 using UnityEngine;
 using Oculus.Interaction;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Grabbable), typeof(Rigidbody), typeof(Collider))]
 public class Arrow : MonoBehaviour
@@ -20,6 +21,9 @@ public class Arrow : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         grabbable = GetComponent<Grabbable>();
         col = GetComponent<Collider>();
+
+        rb.angularDrag = 1.0f; // Some angular drag for stability
+        rb.drag = 0.1f; // Some linear drag to simulate air resistance
     }
 
     private void OnEnable()
@@ -60,17 +64,16 @@ public class Arrow : MonoBehaviour
         IsHeldByHand = false;
         IsNocked = true;
 
-        // NOTE: We do NOT disable grabbable anymore, so you can take it off!
-        // grabbable.enabled = false; 
-
-        // Turn off physics so it sticks to the bow
         rb.isKinematic = true;
         rb.useGravity = false;
 
-        // Attach to string
         transform.SetParent(nockPoint);
+
+
+        // The code below is half working, and is meant to fix slight misalignments when nocking.
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
+
     }
 
     // New function to handle taking the arrow OFF the string
